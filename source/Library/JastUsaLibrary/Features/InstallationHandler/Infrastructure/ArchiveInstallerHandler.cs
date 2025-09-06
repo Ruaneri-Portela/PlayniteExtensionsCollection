@@ -1,16 +1,8 @@
 ﻿using JastUsaLibrary.Features.InstallationHandler.Application;
 using JastUsaLibrary.Features.InstallationHandler.Domain;
 using SharpCompress.Archives;
-using SharpCompress.Archives.SevenZip;
-using SharpCompress.Archives.Zip;
 using SharpCompress.Common;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JastUsaLibrary.Features.InstallationHandler.Infrastructure
 {
@@ -24,30 +16,24 @@ namespace JastUsaLibrary.Features.InstallationHandler.Infrastructure
             _detector = detector;
         }
 
-        public bool CanHandle(string filePath, string content)
+        public bool CanHandle(string filePath, InstallerType type)
         {
-            var fileExtension = Path.GetExtension(filePath).ToLowerInvariant();
-            if (fileExtension == ".zip" || fileExtension == ".7z")
+            if (filePath == null || type != InstallerType.Archive)
             {
-                return true;
+                return false;
             }
-
-            if (fileExtension == ".exe" && _detector.IsSfxArchive(filePath))
-            {
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
-        public void Install(InstallRequest request)
+        public bool Install(InstallRequest request)
         {
             var outputDir = request.TargetDirectory ?? Path.Combine(Path.GetDirectoryName(request.FilePath), Path.GetFileNameWithoutExtension(request.FilePath));
             Directory.CreateDirectory(outputDir);
             if (!TryExtractArchive(request.FilePath, outputDir))
             {
-                throw new InvalidOperationException("Cannot extract archive: " + request.FilePath);
+                return false;
             }
+            return true;
         }
 
         private bool TryExtractArchive(string filePath, string outputDir)
@@ -77,5 +63,15 @@ namespace JastUsaLibrary.Features.InstallationHandler.Infrastructure
             }
         }
 
+        public bool Uninstall(InstallRequest request)
+        {
+            // Stub
+            if (Directory.Exists(request.TargetDirectory))
+            {
+                Directory.Delete(request.TargetDirectory, recursive: true);
+                return true;
+            }
+            return false;
+        }
     }
 }

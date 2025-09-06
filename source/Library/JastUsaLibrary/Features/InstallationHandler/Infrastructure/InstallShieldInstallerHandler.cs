@@ -1,11 +1,5 @@
 ﻿using JastUsaLibrary.Features.InstallationHandler.Application;
 using JastUsaLibrary.Features.InstallationHandler.Domain;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JastUsaLibrary.Features.InstallationHandler.Infrastructure
 {
@@ -13,22 +7,25 @@ namespace JastUsaLibrary.Features.InstallationHandler.Infrastructure
     {
         public InstallerType Type => InstallerType.InstallShield;
 
-        public bool CanHandle(string filePath, string content) => content.Contains("InstallShield");
-
-        public void Install(InstallRequest request)
+        public bool CanHandle(string filePath, InstallerType type)
         {
-            var startInfo = new ProcessStartInfo
+            if (filePath == null || type != InstallerType.InstallShield)
             {
-                FileName = request.FilePath,
-                Arguments = "/s /v\"/qn\"",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using (var process = Process.Start(startInfo))
-            {
-                process?.WaitForExit();
+                return false;
             }
+            return true;
+        }
+
+        public bool Install(InstallRequest request)
+        {
+            // Stub
+            return false;
+        }
+
+        public bool Uninstall(InstallRequest request)
+        {
+            // Stub
+            return false;
         }
     }
 }

@@ -13,22 +13,27 @@ namespace JastUsaLibrary.Features.InstallationHandler.Infrastructure
     {
         public InstallerType Type => InstallerType.Nsis;
 
-        public bool CanHandle(string filePath, string content) => content.Contains("Nullsoft");
-
-        public void Install(InstallRequest request)
+        public bool CanHandle(string filePath, InstallerType type)
         {
-            var startInfo = new ProcessStartInfo
+            if (filePath == null || type != InstallerType.Nsis)
             {
-                FileName = request.FilePath,
-                Arguments = "/S",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using (var process = Process.Start(startInfo))
-            {
-                process?.WaitForExit();
+                return false;
             }
+            return true;
+        }
+
+        public bool Install(InstallRequest request)
+        {
+            var arguments = $"/S /D={request.FilePath}";
+            return InstallerHandler.runProcess(request.FilePath,arguments);           
+        }
+
+        public bool Uninstall(InstallRequest request)
+        {
+            var arguments = "/S";
+            if (!string.IsNullOrEmpty(request.FilePath))
+                arguments += $" /D={request.FilePath}";
+            return InstallerHandler.runProcess(request.FilePath, arguments);
         }
     }
 }

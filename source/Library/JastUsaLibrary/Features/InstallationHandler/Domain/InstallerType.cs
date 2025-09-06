@@ -10,6 +10,7 @@ namespace JastUsaLibrary.Features.InstallationHandler.Domain
     {
         Unknown,
         Msi,
+        Msix,
         InnoSetup,
         Nsis,
         InstallShield,

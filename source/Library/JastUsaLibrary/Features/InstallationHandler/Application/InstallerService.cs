@@ -21,8 +21,8 @@ namespace JastUsaLibrary.Features.InstallationHandler.Application
 
         public void Install(InstallRequest request)
         {
-            var content = _detector.ReadFileAsAscii(request.FilePath);
-            var handler = _handlers.FirstOrDefault(h => h.CanHandle(request.FilePath, content));
+            var type = _detector.LookupInstallerType(request.FilePath);
+            var handler = _handlers.FirstOrDefault(h => h.CanHandle(request.FilePath, type));
             if (handler is null)
             {
                 throw new InvalidOperationException("No handler available for file: " + request.FilePath);

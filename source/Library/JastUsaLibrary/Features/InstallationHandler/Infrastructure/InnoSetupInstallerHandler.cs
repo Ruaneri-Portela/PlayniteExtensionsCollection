@@ -1,11 +1,5 @@
 ﻿using JastUsaLibrary.Features.InstallationHandler.Application;
 using JastUsaLibrary.Features.InstallationHandler.Domain;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JastUsaLibrary.Features.InstallationHandler.Infrastructure
 {
@@ -13,22 +7,30 @@ namespace JastUsaLibrary.Features.InstallationHandler.Infrastructure
     {
         public InstallerType Type => InstallerType.InnoSetup;
 
-        public bool CanHandle(string filePath, string content) => content.Contains("Inno Setup");
-
-        public void Install(InstallRequest request)
+        public bool CanHandle(string filePath, InstallerType type)
         {
-            var info = new ProcessStartInfo
+            if (filePath == null || type != InstallerType.InnoSetup)
             {
-                FileName = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART",
-                Arguments = request.FilePath,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+                return false;
+            }
+            return true;
+        }
 
-            using (var process = Process.Start(info))
-            {
-                process?.WaitForExit();
-            } 
+        public bool Install(InstallRequest request)
+        {
+            var arguments = $"/VERYSILENT /CURRENTUSER /SUPPRESSMSGBOXES /DIR={request.TargetDirectory}";
+            return InstallerHandler.runProcess(request.FilePath, arguments);
+        }
+        public bool Uninstall(InstallRequest request)
+        {
+            var arguments = "/VERYSILENT /CURRENTUSER /SUPPRESSMSGBOXES";
+            if (!string.IsNullOrEmpty(request.FilePath))
+            { 
+                arguments += $" /DIR={request.FilePath}"; 
+            }
+
+
+            return InstallerHandler.runProcess(request.FilePath, arguments);
         }
     }
 }

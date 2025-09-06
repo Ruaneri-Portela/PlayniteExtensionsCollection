@@ -9,8 +9,8 @@ namespace JastUsaLibrary.Features.InstallationHandler.Application
 {
     public interface IInstallerHandler
     {
-        InstallerType Type { get; }
-        bool CanHandle(string filePath, string fileContent);
-        void Install(InstallRequest request);
+        bool CanHandle(string filePath, InstallerType fileContent);
+        bool Install(InstallRequest request);
+        bool Uninstall(InstallRequest request);
     }
 }
